@@ -8,5 +8,5 @@ extern "C" {
     void polybiusDecryptFile(const string& inputFile, const string& outputFile);
     string polybiusEncryptText(const string& text, bool verbose = false);
     string polybiusDecryptText(const string& ciphtext, bool verbose = false);
-}
+} 
 #endif
