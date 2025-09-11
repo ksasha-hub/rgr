@@ -9,7 +9,7 @@
 #include <locale>
 #include <codecvt>
 #include <sstream>
-
+ 
 using namespace std;
 
 // Функция для преобразования широких символов в UTF-8
