@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
+ 
 using namespace std;
 
 // Функция для преобразования числа в шестнадцатеричную строку
