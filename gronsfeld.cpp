@@ -8,7 +8,7 @@
 #include <codecvt>
 #include <vector>
 
-using namespace std;
+using namespace std; 
 
 // Функция для преобразования строки в вектор байтов UTF-8
 vector<unsigned char> stringToBytes(const string& str) {
