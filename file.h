@@ -8,3 +8,4 @@ using namespace std;
 vector<unsigned char> readFile(const string& filename);
 void writeFile(const string& filename, const vector<unsigned char>& data);
 #endif
+ 
