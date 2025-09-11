@@ -41,7 +41,7 @@ int main() {
                     gronsfeldCiph();
                     break;
                 case CiphType::BELAZO:
-                    belazoCiph();
+                    belazoCiph(); 
                     break;
                 case CiphType::POLYBIUS:
                     polybiusCiph();
