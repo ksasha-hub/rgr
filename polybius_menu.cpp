@@ -5,7 +5,7 @@
 #include <cstdlib>
 
 using namespace std;
-
+ 
 enum class CiphAction { 
     ENCRYPT = 1, 
     DECRYPT = 2, 
