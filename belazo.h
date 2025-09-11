@@ -9,4 +9,4 @@ extern "C" {
     string belazoEncryptText(const string& text, const string& key, bool verbose = false);
     string belazoDecryptText(const string& ciphtext, const string& key, bool verbose = false);
 }
-#endif
+#endif 
