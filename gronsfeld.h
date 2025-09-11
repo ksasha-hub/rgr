@@ -10,3 +10,4 @@ extern "C" {
     string gronsfeldDecryptText(const string& ciphtext, const string& key, bool verbose = false);
 }
 #endif
+ 
