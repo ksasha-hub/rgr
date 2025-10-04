@@ -9,19 +9,25 @@
 #include <locale>
 #include <codecvt>
 #include <sstream>
- 
+
 using namespace std;
 
-// Функция для преобразования широких символов в UTF-8
-string wideStringToUTF8(const wstring& wideStr) {
-    wstring_convert<codecvt_utf8<wchar_t>> converter;
-    return converter.to_bytes(wideStr);
+// Функция для преобразования числа в шестнадцатеричную строку
+inline string toHex(int number, int width = 2) {
+    stringstream ss;
+    ss << uppercase << hex << setw(width) << setfill('0') << number;
+    return ss.str();
 }
 
-// Функция для преобразования UTF-8 в широкие символы
-wstring utf8ToWideString(const string& utf8Str) {
-    wstring_convert<codecvt_utf8<wchar_t>> converter;
-    return converter.from_bytes(utf8Str);
+// Функция для преобразования шестнадцатеричной строки в число
+inline int fromHex(const string& hexStr) {
+    int value;
+    stringstream ss;
+    ss << hex << hexStr;
+    if (!(ss >> value)) {
+        throw runtime_error("Неверный hex формат: " + hexStr);
+    }
+    return value;
 }
 
 string belazoEncryptText(const string& text, const string& key, bool verbose) {
@@ -35,32 +41,38 @@ string belazoEncryptText(const string& text, const string& key, bool verbose) {
         cout << "----------------------------------" << endl;
     }
     
-    // Преобразуем текст и ключ в широкие символы
-    wstring wideText = utf8ToWideString(text);
-    wstring wideKey = utf8ToWideString(key);
-    wstring resultWide;
-    int keyIndex = 0;
+    string result;
     
-    for (wchar_t c : wideText) {
-        wchar_t keyChar = wideKey[keyIndex % wideKey.size()];
-        wchar_t encrypted = (c + keyChar) % 65536;
-        resultWide += encrypted;
+    for (size_t i = 0; i < text.size(); i++) {
+        unsigned char c = text[i];
+        unsigned char keyChar = key[i % key.size()];
+        int encrypted = (c + keyChar) % 256;
+        
+        // Преобразуем в HEX для читаемости
+        string hexCode = toHex(encrypted);
+        result += hexCode;
         
         if (verbose) {
-            wcout << L"Символ: '" << c << L"' (код: " << (int)c << L")";
-            wcout << L" + Ключ: '" << keyChar << L"' (код: " << (int)keyChar << L")";
-            wcout << L" = '" << encrypted << L"' (код: " << (int)encrypted << L")";
-            wcout << L" [ключ из позиции " << keyIndex % wideKey.size() << L"]" << endl;
+            cout << "Позиция " << i << ": ";
+            cout << "Символ: '";
+            if (isprint(c) && c != ' ') cout << c;
+            else if (c == ' ') cout << " ";
+            else cout << "\\x" << hex << setw(2) << setfill('0') << (int)c << dec;
+            cout << "' (код: " << (int)c << ")";
+            cout << " + Ключ: '" << keyChar << "' (код: " << (int)keyChar << ")";
+            cout << " = HEX: " << hexCode << " (код: " << encrypted << ")";
+            cout << " [ключ из позиции " << i % key.size() << "]" << endl;
         }
         
-        keyIndex++;
+        // Добавляем пробел между кодами, но не после последнего символа
+        if (i < text.size() - 1) {
+            result += " ";
+        }
     }
-    
-    string result = wideStringToUTF8(resultWide);
     
     if (verbose) {
         cout << "----------------------------------" << endl;
-        cout << "Зашифрованный текст: " << result << endl;
+        cout << "Результат шифрования: " << result << endl;
         cout << "==================================" << endl;
     }
     
@@ -72,38 +84,57 @@ string belazoDecryptText(const string& ciphtext, const string& key, bool verbose
     
     if (verbose) {
         cout << "=== ПРОЦЕСС ДЕШИФРОВАНИЯ БЕЛАЗО ===" << endl;
-        cout << "Зашифрованный текст: " << ciphtext << endl;
+        cout << "Результат шифрования: " << ciphtext << endl;
         cout << "Ключ: " << key << endl;
         cout << "Длина ключа: " << key.size() << endl;
         cout << "----------------------------------" << endl;
     }
     
-    // Преобразуем зашифрованный текст и ключ в широкие символы
-    wstring wideCipher = utf8ToWideString(ciphtext);
-    wstring wideKey = utf8ToWideString(key);
-    wstring resultWide;
-    int keyIndex = 0;
+    string result;
+    size_t i = 0;
+    int charIndex = 0;
     
-    for (wchar_t c : wideCipher) {
-        wchar_t keyChar = wideKey[keyIndex % wideKey.size()];
-        wchar_t decrypted = (c - keyChar + 65536) % 65536;
-        resultWide += decrypted;
-        
-        if (verbose) {
-            wcout << L"Символ: '" << c << L"' (код: " << (int)c << L")";
-            wcout << L" - Ключ: '" << keyChar << L"' (код: " << (int)keyChar << L")";
-            wcout << L" = '" << decrypted << L"' (код: " << (int)decrypted << L")";
-            wcout << L" [ключ из позиции " << keyIndex % wideKey.size() << L"]" << endl;
+    while (i < ciphtext.length()) {
+        // Пропускаем пробелы
+        while (i < ciphtext.length() && isspace(ciphtext[i])) {
+            i++;
         }
         
-        keyIndex++;
+        // Извлекаем две шестнадцатеричные цифры
+        if (i + 1 < ciphtext.length() && isxdigit(ciphtext[i]) && isxdigit(ciphtext[i + 1])) {
+            string hexStr = ciphtext.substr(i, 2);
+            try {
+                int code = fromHex(hexStr);
+                unsigned char keyChar = key[charIndex % key.size()];
+                unsigned char decrypted = (code - keyChar + 256) % 256;
+                result += decrypted;
+                
+                if (verbose) {
+                    cout << "HEX: " << hexStr << " (код: " << code << ")";
+                    cout << " - Ключ: '" << keyChar << "' (код: " << (int)keyChar << ")";
+                    cout << " = Символ: '";
+                    if (isprint(decrypted) && decrypted != ' ') cout << decrypted;
+                    else if (decrypted == ' ') cout << " ";
+                    else cout << "\\x" << hex << setw(2) << setfill('0') << (int)decrypted << dec;
+                    cout << "' (код: " << (int)decrypted << ")";
+                    cout << " [ключ из позиции " << charIndex % key.size() << "]" << endl;
+                }
+                
+                charIndex++;
+            } catch (const exception& e) {
+                throw runtime_error("Ошибка при обработке hex-последовательности: " + hexStr);
+            }
+            
+            i += 2;
+        } else if (i < ciphtext.length() && !isspace(ciphtext[i])) {
+            // Если осталась неполная hex-последовательность
+            throw runtime_error("Неполная hex-последовательность в позиции: " + to_string(i));
+        }
     }
-    
-    string result = wideStringToUTF8(resultWide);
     
     if (verbose) {
         cout << "----------------------------------" << endl;
-        cout << "Расшифрованный текст: " << result << endl;
+        cout << "Результат расшифровки: " << result << endl;
         cout << "==================================" << endl;
     }
     
