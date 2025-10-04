@@ -7,18 +7,18 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
- 
+
 using namespace std;
 
 // Функция для преобразования числа в шестнадцатеричную строку
-string toHex(int number, int width = 2) {
+inline string toHex(int number, int width = 2) {
     stringstream ss;
     ss << uppercase << hex << setw(width) << setfill('0') << number;
     return ss.str();
 }
 
 // Функция для преобразования шестнадцатеричной строки в число
-int fromHex(const string& hexStr) {
+inline int fromHex(const string& hexStr) {
     int value;
     stringstream ss;
     ss << hex << hexStr;
@@ -62,7 +62,7 @@ string polybiusEncryptText(const string& text, bool verbose) {
     
     if (verbose) {
         cout << "----------------------------------" << endl;
-        cout << "Зашифрованный текст: " << result << endl;
+        cout << "Результат шифрования: " << result << endl;
         cout << "==================================" << endl;
     }
     
@@ -72,7 +72,7 @@ string polybiusEncryptText(const string& text, bool verbose) {
 string polybiusDecryptText(const string& ciphtext, bool verbose) {
     if (verbose) {
         cout << "=== ПРОЦЕСС ДЕШИФРОВАНИЯ ПОЛИБИЯ ===" << endl;
-        cout << "Зашифрованный текст: " << ciphtext << endl;
+        cout << "Результат шифрования: " << ciphtext << endl;
         cout << "----------------------------------" << endl;
     }
     
@@ -113,7 +113,7 @@ string polybiusDecryptText(const string& ciphtext, bool verbose) {
     
     if (verbose) {
         cout << "----------------------------------" << endl;
-        cout << "Расшифрованный текст: " << result << endl;
+        cout << "Результат расшифровки: " << result << endl;
         cout << "==================================" << endl;
     }
     
