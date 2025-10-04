@@ -6,7 +6,7 @@
 #include <iomanip>
 
 using namespace std;
- 
+
 enum class CiphAction { 
     ENCRYPT = 1, 
     DECRYPT = 2, 
@@ -66,14 +66,8 @@ void belazoCiph() {
                             cout << "Введите ключ: ";
                             getline(cin, key);
                             
-                            string ciphtext = belazoEncryptText(text, key, true);
-                            cout << "Результат шифрования: ";
-                            for (auto c : ciphtext) {
-                                if (isprint(c) && c != ' ') cout << c;
-                                else if (c == ' ') cout << " ";
-                                else cout << "\\x" << hex << setw(2) << setfill('0') << (int)c << dec;
-                            }
-                            cout << endl;
+                            string result = belazoEncryptText(text, key, true);
+                            cout << "Результат шифрования: " << result << endl;
                             break;
                         }
                         case InCiph::FILE_INPUT: {
@@ -100,7 +94,7 @@ void belazoCiph() {
                 }
                 case CiphAction::DECRYPT: {
                     system("clear");
-                    cout << "1. Ввести текст с консоли" << endl;
+                    cout << "1. Ввести результат шифрования с консоли" << endl;
                     cout << "2. Расшифровать файл" << endl;
                     cout << "3. Назад" << endl;
                     cout << "Выберите источник данных: ";
@@ -118,7 +112,7 @@ void belazoCiph() {
                     switch (decryptSource) {
                         case InCiph::CONSOLE_INPUT: {
                             string ciphtext, key;
-                            cout << "Введите зашифрованный текст: ";
+                            cout << "Введите результат шифрования: ";
                             getline(cin, ciphtext);
                             cout << "Введите ключ: ";
                             getline(cin, key);
@@ -129,7 +123,7 @@ void belazoCiph() {
                         }
                         case InCiph::FILE_INPUT: {
                             string inputFile, outputFile, key;
-                            cout << "Введите имя зашифрованного файла: ";
+                            cout << "Введите имя файла с результатом шифрования: ";
                             getline(cin, inputFile);
                             cout << "Введите имя файла для сохранения: ";
                             getline(cin, outputFile);
